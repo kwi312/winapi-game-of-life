@@ -11,8 +11,8 @@
 #pragma comment(lib, "user32.lib")
 #pragma commemt(lib, "Gdi32.lib")
 #pragma comment(lib, "kernel32.lib")
-#define BOARDSIZE 100 // размер поля (обе стороны)
-#define MAX_INDEX 99 // значение для итераторов, должно быть равно (BOARDSIZE - 1)
+#define BOARDSIZE 75 // размер поля (обе стороны)
+#define MAX_INDEX 74  // значение для итераторов, должно быть равно (BOARDSIZE - 1)
 #define ubyte unsigned char
 static unsigned char board[BOARDSIZE][BOARDSIZE];
 static unsigned char mouseDown = 0;
@@ -146,12 +146,22 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		mouseDown = 1;
 		break;
 	case WM_MOUSEMOVE:
-		if (mouseDown == 1) {
+		if (mouseDown == 1 || mouseDown == 2) {
 			POINT mpt;
 			mpt.x = GET_X_LPARAM(lParam);
 			mpt.y = GET_Y_LPARAM(lParam);
 			if (mpt.x < (BOARDSIZE * 10) && mpt.y < (BOARDSIZE * 10)) {
-				board[mpt.y / 10][mpt.x / 10] = 1;
+				switch (mouseDown)
+				{
+				case 1:
+					board[mpt.y / 10][mpt.x / 10] = 1;
+					break;
+				case 2:
+					board[mpt.y / 10][mpt.x / 10] = 0;
+				default:
+					break;
+				}
+				
 				mouseMoves++;
 				if (mouseMoves % 30 == 0) { //это некий костыль, нужный чтобы уменьшить количество перерисовок окна при рисовании линий а то уж очень сильно мерцало (так как все примитивы рисуются через GDI и никакой вертикалки или чего-то подобного тут вроде нет)
 					RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
@@ -163,6 +173,20 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		mouseDown = 0;
 		mouseMoves = 0;
 		RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
+		break;
+	case WM_RBUTTONDOWN:
+		POINT rmpt;
+		rmpt.x = GET_X_LPARAM(lParam);
+		rmpt.y = GET_Y_LPARAM(lParam);
+		if (rmpt.x < (BOARDSIZE * 10) && rmpt.y < (BOARDSIZE * 10)) {
+			board[rmpt.y / 10][rmpt.x / 10] = 0;
+			mouseDown = 2;
+		}
+		RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
+		break;
+	case WM_RBUTTONUP:
+		mouseDown = 0;
+		mouseMoves = 0;
 		break;
 	case WM_SETCURSOR:
 		SetCursor(cursor);
