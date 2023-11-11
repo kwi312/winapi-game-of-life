@@ -1,5 +1,5 @@
 @echo off
 echo  
-cl.exe %~dp0\main.c  /link /DEFAULTLIB:user32.lib /DEFAULTLIB:kernel32.lib /DEFAULTLIB:Gdi32.lib /SUBSYSTEM:WINDOWS
+cl.exe %~dp0\main.c  /link /DEFAULTLIB:user32.lib /DEFAULTLIB:kernel32.lib /DEFAULTLIB:Gdi32.lib /SUBSYSTEM:WINDOWS /out:gol.exe
 echo
 @echo on
